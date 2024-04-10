@@ -117,25 +117,35 @@
 			const [currencySymbol, setCurrencySymbol] = React.useState("$");
 
 			const [livingCosts, setLivingCosts] = React.useState(2000);
+			const [savingsContribution, setSavingsContribution] = React.useState(500);
 
 			const [houseValue, setHouseValue] = React.useState(100000);
 			const [houseAmortizationPeriod, setHouseAmortizationPeriod] = React.useState(30);
-			const [houseMaintenance, setHouseMaintenance] = React.useState(2.0);
+			const [houseMaintenance, setHouseMaintenance] = React.useState(2);
+			const [mortgageInterest, setMortgageInterest] = React.useState(0);
+			const [householdAppliancesValue, setHouseholdAppliancesValue] = React.useState(1000);
+			const [householdAppliancesAmortizationPeriod, setHouseholdAppliancesAmortizationPeriod] = React.useState(10);
 
 			const [vehicleValue, setVehicleValue] = React.useState(15000);
-			const [vehicleAmortizationPeriod, setVehicleAmortizationPeriod] = React.useState(8);
+			const [vehicleAmortizationPeriod, setVehicleAmortizationPeriod] = React.useState(10);
 
-			const [travelCosts, setTravelCosts] = React.useState(10000);
+			const [travelCosts, setTravelCosts] = React.useState(5000);
 
-			const [retentionPlan, setRetentionPlan] = React.useState(5000);
+			const [retentionPlan, setRetentionPlan] = React.useState(0);
+
+			const [taxes, setTaxes] = React.useState(1000);
 
 			const total = Math.round(
 				livingCosts
+				+ savingsContribution
 				+ (houseValue / houseAmortizationPeriod / 12)
 				+ (houseValue / 100 * houseMaintenance / 12)
+				+ mortgageInterest
+				+ (householdAppliancesValue / householdAppliancesAmortizationPeriod / 12)
 				+ (vehicleValue / vehicleAmortizationPeriod / 12)
 				+ (travelCosts / 12)
 				+ (retentionPlan / 12)
+				+ (taxes / 12)
 			);
 
 			return (
@@ -156,7 +166,17 @@
 							onChange={setLivingCosts}
 							prefix={`${currency} ${currencySymbol}`}
 							postfix="per month"
-							inputProps={{ min: "100", step: "10" }}
+							inputProps={{ min: 100, step: 10 }}
+						/>
+						<NumericFormField
+							id="savingsContribution"
+							title="Savings contribution"
+							description="Monthly amount you save for special events (excluding replacement of household appliances or vehicles)"
+							value={savingsContribution}
+							onChange={setSavingsContribution}
+							prefix={`${currency} ${currencySymbol}`}
+							postfix="per month"
+							inputProps={{ min: 0, step: 10 }}
 						/>
 					</FormCard>
 
@@ -168,25 +188,52 @@
 							value={houseValue}
 							onChange={setHouseValue}
 							prefix={`${currency} ${currencySymbol}`}
-							inputProps={{ min: "1000", step: "1000" }}
+							inputProps={{ min: 1000, step: 1000 }}
 						/>
 						<NumericFormField
 							id="houseAmortizationPeriod"
 							title="House or apartment amortization period"
-							description="Time in which you spare for the value or plan to pay back the morge for your house or apartment."
+							description="Time to save money or pay back the mortgage for your house or apartment."
 							value={houseAmortizationPeriod}
 							onChange={setHouseAmortizationPeriod}
 							postfix="years"
-							inputProps={{ min: "1", step: "1", max: "100" }}
+							inputProps={{ min: 1, step: 1, max: 100 }}
 						/>
 						<NumericFormField
 							id="houseMaintenance"
 							title="House or apartment maintenance costs"
-							description="Yearly maintenance cost of your house or apartment in percentage of the total value"
+							description="Yearly maintenance cost of your house or apartment in percentage of the total value."
 							value={houseMaintenance}
 							onChange={setHouseMaintenance}
 							postfix="% per year"
-							inputProps={{ min: "0.5", step: "0.5", max: "100" }}
+							inputProps={{ min: 0, step: 0.5, max: 100 }}
+						/>
+						<NumericFormField
+							id="mortgageInterest"
+							title="Mortgage interest"
+							description="The interest you pay monthly for the mortgage of your house or apartment."
+							value={mortgageInterest}
+							onChange={setMortgageInterest}
+							postfix="per month"
+							inputProps={{ min: 0, step: 10 }}
+						/>
+						<NumericFormField
+							id="householdAppliancesValue"
+							title="Household appliances value"
+							description="The total value of your household appliances like washing machines or dishwashers."
+							value={householdAppliancesValue}
+							onChange={setHouseholdAppliancesValue}
+							postfix="per month"
+							inputProps={{ min: 0, step: 10 }}
+						/>
+						<NumericFormField
+							id="householdAppliancesAmortizationPeriod"
+							title="Household appliances amortization period"
+							description="Lifetime of your electrical appliances."
+							value={householdAppliancesAmortizationPeriod}
+							onChange={setHouseholdAppliancesAmortizationPeriod}
+							postfix="years"
+							inputProps={{ min: 1, step: 1, max: 50 }}
 						/>
 					</FormCard>
 
@@ -194,20 +241,20 @@
 						<NumericFormField
 							id="vehicleValue"
 							title="Vehicle value"
-							description="Total value of the vehicle(s) you own, e.g. car, (electric) bicycles, motor cycle, etc."
+							description="Total value of the vehicle(s) you own, e.g. car, (electric) bicycles, motor cycle, etc. and public transport pass expenses."
 							value={vehicleValue}
 							onChange={setVehicleValue}
 							prefix={`${currency} ${currencySymbol}`}
-							inputProps={{ min: "000", step: "200" }}
+							inputProps={{ min: 0, step: 200 }}
 						/>
 						<NumericFormField
 							id="vehicleAmortizationPeriod"
 							title="Vehicle(s) amortization period"
-							description="Time in which you spare for the value or plan to pay back the loan for your vehicle."
+							description="Time to save money or pay back the the loan for your vehicle or your public transport pass is valid."
 							value={vehicleAmortizationPeriod}
 							onChange={setVehicleAmortizationPeriod}
 							postfix="years"
-							inputProps={{ min: "1", step: "1", max: "20" }}
+							inputProps={{ min: 1, step: 1, max: 20 }}
 						/>
 					</FormCard>
 
@@ -220,20 +267,33 @@
 							onChange={setTravelCosts}
 							prefix={`${currency} ${currencySymbol}`}
 							postfix="per year"
-							inputProps={{ min: "100", step: "100" }}
+							inputProps={{ min: 100, step: 100 }}
 						/>
 					</FormCard>
 
 					<FormCard title="Retention plan" icon="shield-fill-check">
 						<NumericFormField
 							id="retentionPlan"
-							title="Travel costs"
+							title="Retention plan and insurance cost"
 							description="Total costs per year you spend on private pension funds, disability insurances, or death benefit insurances on top of the living costs above"
 							value={retentionPlan}
 							onChange={setRetentionPlan}
 							prefix={`${currency} ${currencySymbol}`}
 							postfix="per year"
-							inputProps={{ min: "100", step: "100" }}
+							inputProps={{ min: 100, step: 100 }}
+						/>
+					</FormCard>
+
+					<FormCard title="Taxes" icon="bank2">
+						<NumericFormField
+							id="taxes"
+							title="Taxes"
+							description="Total taxes per year, including income tax, property taxes etc."
+							value={taxes}
+							onChange={setTaxes}
+							prefix={`${currency} ${currencySymbol}`}
+							postfix="per year"
+							inputProps={{ min: 100, step: 100 }}
 						/>
 					</FormCard>
 
@@ -243,10 +303,10 @@
 								<strong>Family net income</strong>
 							</p>
 							<p className="display-6">
-								{currency} ${currencySymbol}{total}
+								{currency} {currencySymbol}{total}
 							</p>
 							<p className="text-light">
-								The monthly net income your family needs to sustain your lifestyle.
+								The monthly family income your family needs to finance their lifestyle.
 							</p>
 						</div>
 					</div>
@@ -257,7 +317,7 @@
 		ReactDOM.createRoot(
 			document.getElementById('root'),
 		).render(
-			<Layout title="Family income calculator for the middle class">
+			<Layout title="Family income calculator (middle class)">
 				<App />
 			</Layout>
 		);
