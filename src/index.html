@@ -4,6 +4,7 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Living costs calculator</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
 
 <body>
@@ -22,7 +23,7 @@
 		const FORM_AMOUNT_FIELD_PREFIX = 'USD $';
 
 		const Layout = ({ title, children }) => (
-			<div className="container-fluid">
+			<div className="container-fluid overflow-hidden">
 				<nav className="navbar bg-dark row">
 					<div className="container-fluid">
 						<h1 className="navbar-brand mb-0 h1 text-light">{title}</h1>
