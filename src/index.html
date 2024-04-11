@@ -109,7 +109,41 @@
 					<option value="¥" />
 				</datalist>
 			</div>
+		);
 
+		const CostsListItem = ({ icon, title, costs, currency, currencySymbol }) => (
+			<li>
+				<i className={`bi bi-${icon}`}></i>{' '}
+				{title} -{' '}
+				<strong>{currency} {currencySymbol}{Math.round(costs)}</strong>
+			</li>
+		);
+
+		const TotalCosts = ({ currency, currencySymbol, costs, total }) => (
+			<div className="card text-bg-success mb-3">
+				<div className="card-body">
+					<p>
+						<strong>Family net income</strong>
+					</p>
+					<p className="display-6">
+						{currency} {currencySymbol}{Math.round(total)}
+					</p>
+					<ul>
+						{costs.map(([icon, title, cost]) => (
+							<CostsListItem
+								icon={icon}
+								title={title}
+								costs={cost}
+								currency={currency}
+								currencySymbol={currencySymbol}
+							/>
+						))}
+					</ul>
+					<p className="text-light">
+						The monthly family income your family needs to finance their lifestyle.
+					</p>
+				</div>
+			</div>
 		);
 
 		const App = () => {
@@ -133,19 +167,43 @@
 
 			const [retentionPlan, setRetentionPlan] = React.useState(0);
 
-			const [taxes, setTaxes] = React.useState(1000);
+			const [incomeTaxRate, setIncomeTaxRate] = React.useState(15);
+			const [propertyTaxes, setPropertyTaxes] = React.useState(1000);
 
-			const total = Math.round(
-				livingCosts
-				+ savingsContribution
-				+ (houseValue / houseAmortizationPeriod / 12)
-				+ (houseValue / 100 * houseMaintenance / 12)
-				+ mortgageInterest
-				+ (householdAppliancesValue / householdAppliancesAmortizationPeriod / 12)
-				+ (vehicleValue / vehicleAmortizationPeriod / 12)
-				+ (travelCosts / 12)
-				+ (retentionPlan / 12)
-				+ (taxes / 12)
+			const detailedCostsBeforeTaxes = [
+				["basket2-fill", "Living costs and Savings", (
+					livingCosts + savingsContribution
+				)],
+				["house-fill", "House, apartment and electrical appliances", (
+					(houseValue / houseAmortizationPeriod / 12)
+					+ (houseValue / 100 * houseMaintenance / 12)
+					+ mortgageInterest
+					+ (householdAppliancesValue / householdAppliancesAmortizationPeriod / 12)
+				)],
+				["car-front-fill", "Vehicles and transportation", (
+					vehicleValue / vehicleAmortizationPeriod / 12
+				)],
+				["airplane-fill", "Travels and vacations", (
+					travelCosts / 12
+				)],
+				["shield-fill-check", "Retention plan and insurances", (
+					retentionPlan / 12
+				)]
+			];
+			const detailedCostsBeforeTaxesSum = detailedCostsBeforeTaxes.reduce(
+				(total, [i, t, costs]) => total + costs, 0
+			);
+			const detailedCosts = [
+				...detailedCostsBeforeTaxes,
+				["bank2", "Taxes", (
+					((detailedCostsBeforeTaxesSum + (propertyTaxes / 12)) / (100 - incomeTaxRate) * incomeTaxRate)
+					+ (propertyTaxes / 12)
+				)]
+			]
+
+			const totalCosts = detailedCosts.reduce(
+				(total, [i, t, costs]) => total + costs,
+				0
 			);
 
 			return (
@@ -286,30 +344,32 @@
 
 					<FormCard title="Taxes" icon="bank2">
 						<NumericFormField
-							id="taxes"
-							title="Taxes"
-							description="Total taxes per year, including income tax, property taxes etc."
-							value={taxes}
-							onChange={setTaxes}
+							id="incomeTaxRate"
+							title="Income tax rate"
+							description="Tax rate that applies to your income"
+							value={incomeTaxRate}
+							onChange={setIncomeTaxRate}
+							postfix="%"
+							inputProps={{ min: 1, step: 1, max: 100 }}
+						/>
+						<NumericFormField
+							id="propertyTaxes"
+							title="Property taxes"
+							description="Total property taxes per year."
+							value={propertyTaxes}
+							onChange={setPropertyTaxes}
 							prefix={`${currency} ${currencySymbol}`}
 							postfix="per year"
 							inputProps={{ min: 100, step: 100 }}
 						/>
 					</FormCard>
 
-					<div className="card text-bg-success mb-3">
-						<div className="card-body">
-							<p>
-								<strong>Family net income</strong>
-							</p>
-							<p className="display-6">
-								{currency} {currencySymbol}{total}
-							</p>
-							<p className="text-light">
-								The monthly family income your family needs to finance their lifestyle.
-							</p>
-						</div>
-					</div>
+					<TotalCosts
+						currency={currency}
+						currencySymbol={currencySymbol}
+						costs={detailedCosts}
+						total={totalCosts}
+					/>
 				</form>
 			);
 		};
